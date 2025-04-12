@@ -1,0 +1,135 @@
+package com.example.metatel1;
+
+
+import android.content.Context;
+import android.graphics.*;
+import android.util.AttributeSet;
+import android.view.MotionEvent;
+import android.view.View;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class MapView extends View {
+    private Bitmap mapBitmap;
+    private final List<PointF> scalePoints = new ArrayList<>();
+    private final List<PointF[]> calibrationLines = new ArrayList<>();
+    private PointF centerPoint = null;
+    private final List<PointF> firePoints = new ArrayList<>();
+    private float radiusPixels = 0f;
+    private double azimuth = 0.0;
+    private double azimuthFix = 0.0;
+
+    private Paint paintRed, paintBlue, paintText;
+
+    public interface OnMapTouchListener {
+        void onMapTouched(float x, float y);
+    }
+
+    private OnMapTouchListener touchListener;
+
+    public MapView(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        init();
+    }
+
+    private void init() {
+        paintRed = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paintRed.setColor(Color.RED);
+        paintRed.setStrokeWidth(3f);
+        paintRed.setStyle(Paint.Style.STROKE);
+
+        paintBlue = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paintBlue.setColor(Color.BLUE);
+        paintBlue.setStrokeWidth(3f);
+        paintBlue.setStyle(Paint.Style.STROKE);
+
+        paintText = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paintText.setColor(Color.RED);
+        paintText.setTextSize(24f);
+    }
+
+    public void setMapBitmap(Bitmap bitmap) {
+        this.mapBitmap = bitmap;
+        invalidate();
+    }
+
+    public void setScalePoints(List<PointF> points) {
+        scalePoints.clear();
+        scalePoints.addAll(points);
+        invalidate();
+    }
+
+    public void addCalibrationLine(PointF p1, PointF p2) {
+        calibrationLines.add(new PointF[]{p1, p2});
+        invalidate();
+    }
+
+    public void clearCalibrationLines() {
+        calibrationLines.clear();
+        invalidate();
+    }
+
+    public void setCenterPoint(PointF center) {
+        this.centerPoint = center;
+        invalidate();
+    }
+
+    public void setFirePoints(List<PointF> points) {
+        firePoints.clear();
+        firePoints.addAll(points);
+        invalidate();
+    }
+
+    public void setRadius(float radius) {
+        this.radiusPixels = radius;
+        invalidate();
+    }
+
+    public void setAzimuth(double azimuth, double azimuthFix) {
+        this.azimuth = azimuth;
+        this.azimuthFix = azimuthFix;
+        invalidate();
+    }
+
+    public void setOnMapTouchListener(OnMapTouchListener listener) {
+        this.touchListener = listener;
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        super.onDraw(canvas);
+        canvas.drawColor(Color.BLACK);
+        if (mapBitmap != null) canvas.drawBitmap(mapBitmap, 0, 0, null);
+
+        for (PointF[] line : calibrationLines) {
+            PointF p1 = line[0], p2 = line[1];
+            canvas.drawCircle(p1.x, p1.y, 5f, paintRed);
+            canvas.drawCircle(p2.x, p2.y, 5f, paintRed);
+            canvas.drawLine(p1.x, p1.y, p2.x, p2.y, paintRed);
+        }
+
+        for (PointF p : scalePoints) canvas.drawCircle(p.x, p.y, 5f, paintRed);
+
+        if (centerPoint != null) {
+            canvas.drawCircle(centerPoint.x, centerPoint.y, radiusPixels, paintRed);
+            double totalAzimuth = azimuth + azimuthFix;
+            double rad = Math.toRadians(totalAzimuth);
+            float x2 = (float) (centerPoint.x + radiusPixels * Math.sin(rad));
+            float y2 = (float) (centerPoint.y - radiusPixels * Math.cos(rad));
+            canvas.drawLine(centerPoint.x, centerPoint.y, x2, y2, paintBlue);
+        }
+
+        for (PointF p : firePoints)
+            canvas.drawCircle(p.x, p.y, 5f, paintBlue);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (event.getAction() == MotionEvent.ACTION_DOWN && touchListener != null) {
+            touchListener.onMapTouched(event.getX(), event.getY());
+            return true;
+        }
+        return super.onTouchEvent(event);
+    }
+}

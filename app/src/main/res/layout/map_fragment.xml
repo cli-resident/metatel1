@@ -1,0 +1,176 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/map_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MapFragment">
+
+    <!-- Кнопки: Reset и Select Image -->
+
+    <!-- Кнопки режимов -->
+
+    <!-- Scale и Mode -->
+
+    <Button
+        android:id="@+id/resetBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Reset"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <Button
+        android:id="@+id/fireModeBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Set Fire Point"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@+id/scaleModeBtn" />
+
+    <Button
+        android:id="@+id/scaleModeBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Set Scale"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/fireModeBtn"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@+id/centerModeBtn" />
+
+    <Button
+        android:id="@+id/centerModeBtn"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Set Center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/scaleModeBtn"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <!-- Ввод угла -->
+
+    <TextView
+        android:id="@+id/scaleLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="30dp"
+        android:text="Scale: Not set"
+        app:layout_constraintStart_toEndOf="@+id/resetBtn"
+        app:layout_constraintTop_toBottomOf="@+id/deltaLabel" />
+
+    <TextView
+        android:id="@+id/modeLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="80dp"
+        android:text="Mode: Set Scale"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/deltaLabel" />
+
+    <TextView
+        android:id="@+id/deltaLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:text="delta azimuth: 0.00°, delta speed: 0.00"
+        app:layout_constraintStart_toEndOf="@+id/resetBtn"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Azimuth:"
+        app:layout_constraintBottom_toTopOf="@+id/speedSeekBar"
+        app:layout_constraintEnd_toStartOf="@+id/azimuthInput"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <EditText
+        android:id="@+id/azimuthInput"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:hint="Azimuth"
+        android:inputType="numberDecimal"
+        android:text="0.0"
+        app:layout_constraintBottom_toTopOf="@+id/speedSeekBar"
+        app:layout_constraintEnd_toStartOf="@+id/textView2"
+        app:layout_constraintStart_toEndOf="@+id/textView" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Angle:"
+        app:layout_constraintBottom_toTopOf="@+id/speedSeekBar"
+        app:layout_constraintEnd_toStartOf="@+id/angleInput"
+        app:layout_constraintStart_toEndOf="@+id/azimuthInput" />
+
+    <EditText
+        android:id="@+id/angleInput"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:hint="Angle"
+        android:inputType="numberDecimal"
+        android:text="45.0"
+        app:layout_constraintBottom_toTopOf="@+id/speedSeekBar"
+        app:layout_constraintEnd_toStartOf="@+id/textView3"
+        app:layout_constraintStart_toEndOf="@+id/textView2" />
+
+    <!-- Ползунок скорости -->
+
+    <!-- Кастомный MapView -->
+
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Real distance (m):"
+        app:layout_constraintBottom_toTopOf="@+id/speedSeekBar"
+        app:layout_constraintEnd_toStartOf="@+id/distanceInput"
+        app:layout_constraintStart_toEndOf="@+id/angleInput" />
+
+    <EditText
+        android:id="@+id/distanceInput"
+        android:layout_width="60dp"
+        android:layout_height="wrap_content"
+        android:hint="0.0"
+        android:inputType="numberDecimal"
+        app:layout_constraintBottom_toTopOf="@+id/speedValue"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView3" />
+
+    <SeekBar
+        android:id="@+id/speedSeekBar"
+        android:layout_width="0dp"
+        android:layout_height="20dp"
+        android:max="200"
+        android:progress="10"
+        app:layout_constraintBottom_toTopOf="@+id/centerModeBtn"
+        app:layout_constraintEnd_toStartOf="@+id/speedValue"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.example.metatel1.MapView
+        android:id="@+id/mapView"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/angleInput"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/resetBtn" />
+
+    <TextView
+        android:id="@+id/speedValue"
+        android:layout_width="80dp"
+        android:layout_height="20dp"
+        android:text="Speed: 10"
+        app:layout_constraintBottom_toTopOf="@+id/scaleModeBtn"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/speedSeekBar" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
