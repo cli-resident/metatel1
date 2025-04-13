@@ -94,7 +94,6 @@ public class MapFragment extends Fragment {
         speedSeekBar = root.findViewById(R.id.speedSeekBar);
         speedValue = root.findViewById(R.id.speedValue);
 
-
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT); // запрос фотки
         intent.setType("image/*");
         startActivityForResult(intent, REQUEST_IMAGE); // обработка получения фотки \/
@@ -149,7 +148,6 @@ public class MapFragment extends Fragment {
     private void updateRadiusDisplay() { // обновление радиуса
         double range = (speed * speed * Math.sin(Math.toRadians(2 * angle))) / 9.81;
         radiusPixels = (float) (scale > 0 ? range / scale : range);
-
         mapView.setRadius(radiusPixels);
         mapView.setAzimuth(azimuth, azimuthFix);
         mapView.invalidate();
@@ -162,17 +160,12 @@ public class MapFragment extends Fragment {
         centerPoint = null;
         firePoints.clear();
         scalePoints.clear();
-
         mapView.setFirePoints(firePoints);
         mapView.setCenterPoint(null);
         mapView.setScalePoints(scalePoints);
         mapView.setRadius(0);
-
-        // Удаляем линии калибровки
         mapView.clearCalibrationLines();
-
         mapView.invalidate();
-
         scaleLabel.setText("Scale: Not set");
         deltaLabel.setText("delta azimuth: 0.00°, delta speed: 0.00");
     }
@@ -238,7 +231,6 @@ public class MapFragment extends Fragment {
                         int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
                         exifStream.close();
                         bmp = rotateBitmapIfRequired(bmp, orientation); // поворот если чето не так
-
                         int mapViewWidth = mapView.getWidth(); // масштаб под View
                         int mapViewHeight = mapView.getHeight();
                         float imageAspect = (float) bmp.getWidth() / bmp.getHeight();

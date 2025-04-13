@@ -7,6 +7,7 @@ import android.view.*;
 import android.widget.Button;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.PopupMenu;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
@@ -23,6 +24,7 @@ public class HomeFragment extends Fragment {
             Manifest.permission.BLUETOOTH_SCAN
     };
     boolean connected = false;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -59,6 +61,19 @@ public class HomeFragment extends Fragment {
                 connectionStatus.setText("Подключитесь перед использованием!");
             }
         });
+        Button menuButton = root.findViewById(R.id.menu_button);
+        menuButton.setOnClickListener(v -> {
+            PopupMenu popup = new PopupMenu(requireContext(), v);
+            popup.getMenuInflater().inflate(R.menu.main_menu, popup.getMenu());
+            popup.setOnMenuItemClickListener(item -> {
+                if (item.getItemId() == R.id.action_settings) {
+                    return true;
+                }
+                return false;
+            });
+            popup.show();
+        });
+
 
         return root;
     }
