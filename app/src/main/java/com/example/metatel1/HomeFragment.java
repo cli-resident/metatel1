@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import android.Manifest;
+import android.widget.TextView;
 
 
 public class HomeFragment extends Fragment {
@@ -29,6 +30,7 @@ public class HomeFragment extends Fragment {
 
         Button BTButton = root.findViewById(R.id.BTButton);
         Button EnterButton = root.findViewById(R.id.EnterButton);
+        TextView connectionStatus = root.findViewById(R.id.connection);
 
         BTButton.setOnClickListener(v -> {
             BluetoothManager manager = BluetoothManager.getInstance(getContext());
@@ -41,8 +43,15 @@ public class HomeFragment extends Fragment {
                 }
             }
 
-            manager.connectToDevice("METATEL");
+            boolean connected = manager.connectToDevice("METATEL");
+            if(connected){
+                connectionStatus.setText("Состояние: Подключено");
+            }else{
+                connectionStatus.setText("Состояние: Не подключено");
+            }
+
         });
+
 
         EnterButton.setOnClickListener(v -> {
             NavController navController = Navigation.findNavController(requireView());
