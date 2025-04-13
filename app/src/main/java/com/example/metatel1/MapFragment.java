@@ -26,7 +26,7 @@ public class MapFragment extends Fragment {
     private static final int MODE_SET_SCALE = 0;
     private static final int MODE_SET_CENTER = 1;
     private static final int MODE_SET_FIRE = 2;
-    private int currentMode = MODE_SET_SCALE;
+    private int currentMode = MODE_SET_CENTER;
 
     private final List<PointF> scalePoints = new ArrayList<>();
     private final List<PointF> firePoints = new ArrayList<>();
@@ -62,7 +62,7 @@ public class MapFragment extends Fragment {
         manager = BluetoothManager.getInstance(requireContext());
         manager.setCallback(callback);
         cursor = root.findViewById(R.id.cursor);
-        // Bind UI
+        cursor.setVisibility(View.GONE);
         mapView = root.findViewById(R.id.mapView);
         mapView.setOnTouchListener((v, event) -> {
             switch (event.getAction()) {
@@ -201,6 +201,7 @@ public class MapFragment extends Fragment {
             double actualSpeed = speed / Math.sqrt(radiusPixels / distance);
             String formatted = String.format(Locale.US, "%.2f", actualSpeed - speed);
             speedFix = Double.parseDouble(formatted);
+            speed = speed + speedFix;
 
 
             double baseAz = Math.toRadians(azimuth);
@@ -283,7 +284,7 @@ public class MapFragment extends Fragment {
 
             if (p.startsWith("H:")) {
                 try {
-                    azimuth = Double.parseDouble(p.substring(2)) + azimuthFix;
+                    azimuth = Double.parseDouble(p.substring(2));
                 } catch (NumberFormatException ignored) {
                 }
             } else if (p.startsWith("P:")) {

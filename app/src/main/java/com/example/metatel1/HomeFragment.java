@@ -67,6 +67,7 @@ public class HomeFragment extends Fragment {
             popup.getMenuInflater().inflate(R.menu.main_menu, popup.getMenu());
             popup.setOnMenuItemClickListener(item -> {
                 if (item.getItemId() == R.id.action_settings) {
+                    // тут настройки открыть надо
                     return true;
                 }
                 return false;
