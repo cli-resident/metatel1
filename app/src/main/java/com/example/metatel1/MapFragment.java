@@ -159,7 +159,7 @@ public class MapFragment extends Fragment {
     private void handleMapTouch(float x, float y) {
         PointF point = new PointF(x, y);
 
-        if (currentMode == MODE_SET_SCALE) {
+        if (currentMode == MODE_SET_SCALE && !(distanceInput.getText().toString().isEmpty())) {
             scalePoints.add(point);
             mapView.setScalePoints(scalePoints);
             if (scalePoints.size() == 2) {

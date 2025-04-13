@@ -22,16 +22,14 @@ public class HomeFragment extends Fragment {
             Manifest.permission.BLUETOOTH_CONNECT,
             Manifest.permission.BLUETOOTH_SCAN
     };
-
+    boolean connected = false;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.home_fragment, container, false);
-
         Button BTButton = root.findViewById(R.id.BTButton);
         Button EnterButton = root.findViewById(R.id.EnterButton);
         TextView connectionStatus = root.findViewById(R.id.connection);
-
         BTButton.setOnClickListener(v -> {
             BluetoothManager manager = BluetoothManager.getInstance(getContext());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -43,19 +41,23 @@ public class HomeFragment extends Fragment {
                 }
             }
 
-            boolean connected = manager.connectToDevice("METATEL");
+            connected = manager.connectToDevice("METATEL");
             if(connected){
                 connectionStatus.setText("Состояние: Подключено");
             }else{
-                connectionStatus.setText("Состояние: Не подключено");
+                connectionStatus.setText("Состояние: Не удалось подключится");
             }
 
         });
 
 
         EnterButton.setOnClickListener(v -> {
+            if(connected){
             NavController navController = Navigation.findNavController(requireView());
-            navController.navigate(R.id.action_homeFragment_to_mapFragment);
+            navController.navigate(R.id.action_homeFragment_to_mapFragment);}
+            else{
+                connectionStatus.setText("Подключитесь перед использованием!");
+            }
         });
 
         return root;
