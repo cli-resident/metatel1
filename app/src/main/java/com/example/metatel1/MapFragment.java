@@ -74,9 +74,9 @@ public class MapFragment extends Fragment {
         speedValue = root.findViewById(R.id.speedValue);
 
 
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT); // запрос фотки
         intent.setType("image/*");
-        startActivityForResult(intent, REQUEST_IMAGE);
+        startActivityForResult(intent, REQUEST_IMAGE); // обработка получения фотки \/
 
 
         root.findViewById(R.id.resetBtn).setOnClickListener(v -> resetAll());
@@ -125,7 +125,7 @@ public class MapFragment extends Fragment {
         return root;
     }
 
-    private void updateRadiusDisplay() {
+    private void updateRadiusDisplay() { // обновление радиуса
         double range = (speed * speed * Math.sin(Math.toRadians(2 * angle))) / 9.81;
         radiusPixels = (float) (scale > 0 ? range / scale : range);
 
@@ -134,7 +134,7 @@ public class MapFragment extends Fragment {
         mapView.invalidate();
     }
 
-    private void resetAll() {
+    private void resetAll() { // сброс параметров
         scale = 0;
         speedFix = 0;
         azimuthFix = 0;
@@ -156,7 +156,7 @@ public class MapFragment extends Fragment {
         deltaLabel.setText("delta azimuth: 0.00°, delta speed: 0.00");
     }
 
-    private void handleMapTouch(float x, float y) {
+    private void handleMapTouch(float x, float y) { // обработка касания и передача/обработка MapView
         PointF point = new PointF(x, y);
 
         if (currentMode == MODE_SET_SCALE && !(distanceInput.getText().toString().isEmpty())) {
@@ -204,7 +204,7 @@ public class MapFragment extends Fragment {
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) { // получение и обработка фотки
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_IMAGE) {
             if (resultCode == getActivity().RESULT_OK && data != null && data.getData() != null) {
@@ -244,7 +244,7 @@ public class MapFragment extends Fragment {
         }
     }
 
-    private Bitmap rotateBitmapIfRequired(Bitmap bitmap, int orientation) {
+    private Bitmap rotateBitmapIfRequired(Bitmap bitmap, int orientation) { // поворот по exif
         Matrix matrix = new Matrix();
         switch (orientation) {
             case ExifInterface.ORIENTATION_ROTATE_90:
@@ -261,7 +261,7 @@ public class MapFragment extends Fragment {
         }
         return Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
     }
-    private void processSerial(String line) {
+    private void processSerial(String line) {       // парс данных с блютус серийника
         if (line == null || line.isEmpty()) return;
 
         String[] parts = line.split(",");
