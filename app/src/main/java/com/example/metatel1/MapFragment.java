@@ -44,6 +44,7 @@ public class MapFragment extends Fragment {
     private EditText angleInput, azimuthInput, distanceInput;
     private TextView scaleLabel, modeLabel, deltaLabel,speedValue;
     private SeekBar speedSeekBar;
+    private ImageView cursor;
 
     private static final int REQUEST_IMAGE = 1001;
     private BluetoothManager manager;
@@ -60,9 +61,29 @@ public class MapFragment extends Fragment {
         View root = inflater.inflate(R.layout.map_fragment, container, false);
         manager = BluetoothManager.getInstance(requireContext());
         manager.setCallback(callback);
+        cursor = root.findViewById(R.id.cursor);
         // Bind UI
         mapView = root.findViewById(R.id.mapView);
-        mapView.setOnMapTouchListener(this::handleMapTouch);
+        mapView.setOnTouchListener((v, event) -> {
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                case MotionEvent.ACTION_MOVE:
+                    cursor.setVisibility(View.VISIBLE);
+                    float cursorX = event.getX() - cursor.getWidth();
+                    float cursorY = event.getY();
+                    cursor.setX(cursorX);
+                    cursor.setY(cursorY);
+                    break;
+                case MotionEvent.ACTION_UP:
+                    float pointX = event.getX()-cursor.getWidth();
+                    float pointY = event.getY()-cursor.getHeight();
+                    handleMapTouch(pointX, pointY);
+                    cursor.setVisibility(View.GONE);
+                    break;
+            }
+            return true;
+        });
+
 
         scaleLabel = root.findViewById(R.id.scaleLabel);
         modeLabel = root.findViewById(R.id.modeLabel);
@@ -270,7 +291,7 @@ public class MapFragment extends Fragment {
 
             if (p.startsWith("H:")) {
                 try {
-                    azimuth = Double.parseDouble(p.substring(2));
+                    azimuth = Double.parseDouble(p.substring(2)) + azimuthFix;
                 } catch (NumberFormatException ignored) {
                 }
             } else if (p.startsWith("P:")) {
