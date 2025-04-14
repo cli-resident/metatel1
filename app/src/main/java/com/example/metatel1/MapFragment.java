@@ -118,6 +118,25 @@ public class MapFragment extends Fragment {
             modeLabel.setText("Mode: Set Fire Point");
         });
 
+        root.findViewById(R.id.shellbutton).setOnClickListener(v -> {
+            List<Shell> shells = Shell.loadAll(requireContext());
+            if (shells == null || shells.isEmpty()) return;
+
+            PopupMenu popup = new PopupMenu(requireContext(), v);
+
+            for (int i = 0; i < shells.size(); i++) {
+                Shell shell = shells.get(i);
+                popup.getMenu().add(0, i, i, shell.getName());
+            }
+
+            popup.setOnMenuItemClickListener(item -> {
+                Shell selectedShell = shells.get(item.getItemId());
+                Toast.makeText(requireContext(), selectedShell.getName(), Toast.LENGTH_SHORT).show();
+                return true;
+            });
+            popup.show();
+        });
+
         angleInput.setOnFocusChangeListener((v, f) -> {
             if (!f) try {
                 angle = Double.parseDouble(angleInput.getText().toString());
