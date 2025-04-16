@@ -32,6 +32,7 @@ public class BluetoothManager {
     private volatile boolean isReading = false;
     private Thread readThread;
     private BluetoothDataCallback dataCallback;
+    private ConnectionStateListener connectionStateListener;
 
 
     private BluetoothManager(Context context) {
@@ -78,10 +79,12 @@ public class BluetoothManager {
                     bluetoothSocket.connect();
                     inputStream = bluetoothSocket.getInputStream();
                     Log.d(TAG, "Connected to " + deviceName);
+                    notifyConnectionStateChanged(true);
                     startReading();
                     return true;
                 } catch (IOException e) {
                     Log.e(TAG, "Connection failed", e);
+                    notifyConnectionStateChanged(false);
                     return false;
                 }
             }
@@ -115,6 +118,7 @@ public class BluetoothManager {
                     }
                 } catch (IOException e) {
                     Log.e(TAG, "Error in reading thread", e);
+                    notifyConnectionStateChanged(false);
                     break;
                 }
             }
@@ -140,12 +144,26 @@ public class BluetoothManager {
             if (inputStream != null) inputStream.close();
             if (bluetoothSocket != null) bluetoothSocket.close();
             Log.d(TAG, "Connection closed");
+            notifyConnectionStateChanged(false);
         } catch (IOException e) {
             Log.e(TAG, "Error closing connection", e);
         }
     }
 
+    public void setConnectionStateListener(ConnectionStateListener listener) {
+        this.connectionStateListener = listener;
+    }
+
+    private void notifyConnectionStateChanged(boolean isConnected) {
+        if (connectionStateListener != null) {
+            connectionStateListener.onConnectionStateChanged(isConnected);
+        }
+    }
+
     public interface BluetoothDataCallback {
         void onDataReceived(String data);
+    }
+    public interface ConnectionStateListener {
+        void onConnectionStateChanged(boolean isConnected);
     }
 }

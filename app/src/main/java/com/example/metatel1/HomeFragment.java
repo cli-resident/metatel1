@@ -16,7 +16,7 @@ import android.Manifest;
 import android.widget.TextView;
 
 
-public class HomeFragment extends Fragment {
+public class HomeFragment extends Fragment implements BluetoothManager.ConnectionStateListener{
     private static final int REQUEST_BLUETOOTH_PERMISSIONS = 101;
 
     private final String[] bluetoothPermissions = new String[] {
@@ -24,6 +24,7 @@ public class HomeFragment extends Fragment {
             Manifest.permission.BLUETOOTH_SCAN
     };
     boolean connected = false;
+    TextView connectionStatus;
 
     @Nullable
     @Override
@@ -31,9 +32,10 @@ public class HomeFragment extends Fragment {
         View root = inflater.inflate(R.layout.home_fragment, container, false);
         Button BTButton = root.findViewById(R.id.BTButton);
         Button EnterButton = root.findViewById(R.id.EnterButton);
-        TextView connectionStatus = root.findViewById(R.id.connection);
+        connectionStatus = root.findViewById(R.id.connection);
+        BluetoothManager manager = BluetoothManager.getInstance(getContext());
+        manager.setConnectionStateListener(this);
         BTButton.setOnClickListener(v -> {
-            BluetoothManager manager = BluetoothManager.getInstance(getContext());
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED ||
                         ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
@@ -42,14 +44,8 @@ public class HomeFragment extends Fragment {
                     return;
                 }
             }
-
-            connected = manager.connectToDevice("METATEL");
-            if(connected){
-                connectionStatus.setText("Состояние: Подключено");
-            }else{
-                connectionStatus.setText("Состояние: Не удалось подключится");
-            }
-
+            manager.closeConnection();
+            manager.connectToDevice("METATEL");
         });
 
 
@@ -77,5 +73,11 @@ public class HomeFragment extends Fragment {
 
 
         return root;
+    }
+
+    @Override
+    public void onConnectionStateChanged(boolean isConnected) {
+        connected = isConnected;
+        connectionStatus.setText(isConnected ? "Connected" : "Disconnected");
     }
 }
