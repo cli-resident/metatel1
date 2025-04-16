@@ -3,6 +3,7 @@ package com.example.metatel1;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.PointF;
 import android.media.ExifInterface;
@@ -21,7 +22,7 @@ import androidx.navigation.Navigation;
 import java.io.InputStream;
 import java.util.*;
 
-public class MapFragment extends Fragment {
+public class MapFragment extends Fragment implements BluetoothManager.ConnectionStateListener {
 
     private static final int MODE_SET_SCALE = 0;
     private static final int MODE_SET_CENTER = 1;
@@ -42,7 +43,7 @@ public class MapFragment extends Fragment {
 
     private MapView mapView;
     private EditText angleInput, azimuthInput, distanceInput;
-    private TextView scaleLabel, modeLabel, deltaLabel,speedValue;
+    private TextView scaleLabel, modeLabel, deltaLabel,speedValue,connectionStatus;
     private SeekBar speedSeekBar;
     private ImageView cursor;
 
@@ -61,6 +62,7 @@ public class MapFragment extends Fragment {
         View root = inflater.inflate(R.layout.map_fragment, container, false);
         manager = BluetoothManager.getInstance(requireContext());
         manager.setCallback(callback);
+        manager.setConnectionStateListener(this);
         cursor = root.findViewById(R.id.cursor);
         cursor.setVisibility(View.GONE);
         mapView = root.findViewById(R.id.mapView);
@@ -93,6 +95,11 @@ public class MapFragment extends Fragment {
         distanceInput = root.findViewById(R.id.distanceInput);
         speedSeekBar = root.findViewById(R.id.speedSeekBar);
         speedValue = root.findViewById(R.id.speedValue);
+
+        connectionStatus = root.findViewById(R.id.connectionStatus);
+        connectionStatus.setText("Connected");
+        connectionStatus.setTextColor(getResources().getColor(R.color.green));
+
 
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT); // запрос фотки
         intent.setType("image/*");
@@ -312,6 +319,18 @@ public class MapFragment extends Fragment {
                 } catch (NumberFormatException ignored) {
                 }
             }
+        }
+    }
+
+    @Override
+    public void onConnectionStateChanged(boolean isConnected) {
+        connectionStatus = requireView().findViewById(R.id.connectionStatus);
+        if (isConnected) {
+            connectionStatus.setText("Connected");
+            connectionStatus.setTextColor(getResources().getColor(R.color.green));
+        } else {
+            connectionStatus.setText("Disconnected");
+            connectionStatus.setTextColor(getResources().getColor(R.color.red));
         }
     }
 }
