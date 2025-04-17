@@ -27,6 +27,7 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
     private static final int MODE_SET_SCALE = 0;
     private static final int MODE_SET_CENTER = 1;
     private static final int MODE_SET_FIRE = 2;
+    private static final int MODE_SET_AIM = 3;
     private int currentMode = MODE_SET_CENTER;
 
     private final List<PointF> scalePoints = new ArrayList<>();
@@ -40,6 +41,7 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
     private double speedFix = 0;
     private double azimuthFix = 0;
     private float radiusPixels = 0;
+    private Shell selectedShell = null;
 
     private MapView mapView;
     private EditText angleInput, azimuthInput, distanceInput;
@@ -137,8 +139,9 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
             }
 
             popup.setOnMenuItemClickListener(item -> {
-                Shell selectedShell = shells.get(item.getItemId());
-                Toast.makeText(requireContext(), selectedShell.getName(), Toast.LENGTH_SHORT).show();
+                selectedShell = shells.get(item.getItemId());
+                mapView.setShellRadius((float) (selectedShell.getRadius()/scale));
+                Toast.makeText(requireContext(), selectedShell.getName()+selectedShell.getRadius(), Toast.LENGTH_SHORT).show();
                 return true;
             });
             popup.show();
@@ -245,42 +248,31 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) { // получение и обработка фотки
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_IMAGE) {
-            if (resultCode == getActivity().RESULT_OK && data != null && data.getData() != null) {
-                Uri uri = data.getData();
-                try (InputStream stream = getActivity().getContentResolver().openInputStream(uri)) {
-                    Bitmap bmp = BitmapFactory.decodeStream(stream);
-                    if (bmp != null) {
-                        InputStream exifStream = getActivity().getContentResolver().openInputStream(uri); // проверка ориентации через exif (костыль)
-                        ExifInterface exif = new ExifInterface(exifStream);
-                        int orientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
-                        exifStream.close();
-                        bmp = rotateBitmapIfRequired(bmp, orientation); // поворот если чето не так
-                        int mapViewWidth = mapView.getWidth(); // масштаб под View
-                        int mapViewHeight = mapView.getHeight();
-                        float imageAspect = (float) bmp.getWidth() / bmp.getHeight();
-                        float mapViewAspect = (float) mapViewWidth / mapViewHeight;
-                        int targetWidth, targetHeight;
-                        if (imageAspect > mapViewAspect) {
-                            targetWidth = mapViewWidth;
-                            targetHeight = (int) (mapViewWidth / imageAspect);
-                        } else {
-                            targetHeight = mapViewHeight;
-                            targetWidth = (int) (mapViewHeight * imageAspect);
-                        }
-                        bmp = Bitmap.createScaledBitmap(bmp, targetWidth, targetHeight, true);
-                        mapView.setMapBitmap(bmp);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                resetAll();
-            } else {
-                NavController navController = Navigation.findNavController(requireView()); // кидаем обратно если не выбрали фото
-                navController.navigate(R.id.action_mapFragment_to_homeFragment);
+        if (requestCode != REQUEST_IMAGE) return;
+
+        if (resultCode == getActivity().RESULT_OK && data != null && data.getData() != null) {
+            Uri uri = data.getData();
+
+            try (InputStream stream = requireContext().getContentResolver().openInputStream(uri)) {
+                Bitmap src = BitmapFactory.decodeStream(stream);
+                if (src == null) return;
+                try (InputStream exifSt = requireContext().getContentResolver().openInputStream(uri)) {
+                    int orient = new ExifInterface(exifSt).getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+                    src = rotateBitmapIfRequired(src, orient);}
+                final Bitmap bmp = src;
+                mapView.post(() -> {
+                    mapView.setMapBitmap(bmp);
+                });
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+            resetAll();
+        } else {
+            Navigation.findNavController(requireView())
+                    .navigate(R.id.action_mapFragment_to_homeFragment);
         }
     }
 

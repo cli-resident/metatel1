@@ -17,8 +17,13 @@ public class MapView extends View {
     private PointF centerPoint = null;
     private final List<PointF> firePoints = new ArrayList<>();
     private float radiusPixels = 0f;
+    private float shellRadiusPixels = 0f;
     private double azimuth = 0.0;
     private double azimuthFix = 0.0;
+    double totalAzimuth;
+    double rad;
+    float x2;
+    float y2;
 
     private Paint paintRed, paintBlue, paintText;
 
@@ -91,6 +96,10 @@ public class MapView extends View {
         this.azimuthFix = azimuthFix;
         invalidate();
     }
+    public void setShellRadius(float radius) {
+        this.shellRadiusPixels = radius;
+        invalidate();
+    }
 
     public void setOnMapTouchListener(OnMapTouchListener listener) {
         this.touchListener = listener;
@@ -100,7 +109,21 @@ public class MapView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         canvas.drawColor(Color.BLACK);
-        if (mapBitmap != null) canvas.drawBitmap(mapBitmap, 0, 0, null);
+
+        if (mapBitmap != null) {
+            float vw = getWidth();
+            float vh = getHeight();
+            float bw = mapBitmap.getWidth();
+            float bh = mapBitmap.getHeight();
+            float scale = Math.min(vw / bw, vh / bh);
+            float dw = bw * scale;
+            float dh = bh * scale;
+            float left = (vw - dw) / 2f;
+            float top  = (vh - dh) / 2f;
+            RectF dst = new RectF(left, top, left + dw, top + dh);
+            canvas.drawBitmap(mapBitmap, null, dst, null);
+        }
+
 
         for (PointF[] line : calibrationLines) {
             PointF p1 = line[0], p2 = line[1];
@@ -110,18 +133,20 @@ public class MapView extends View {
         }
 
         for (PointF p : scalePoints) canvas.drawCircle(p.x, p.y, 5f, paintRed);
-
         if (centerPoint != null) {
+            totalAzimuth = azimuth + azimuthFix;
+            rad = Math.toRadians(totalAzimuth);
+            x2 = (float) (centerPoint.x + radiusPixels * Math.sin(rad));
+            y2 = (float) (centerPoint.y - radiusPixels * Math.cos(rad));
             canvas.drawCircle(centerPoint.x, centerPoint.y, radiusPixels, paintRed);
-            double totalAzimuth = azimuth + azimuthFix;
-            double rad = Math.toRadians(totalAzimuth);
-            float x2 = (float) (centerPoint.x + radiusPixels * Math.sin(rad));
-            float y2 = (float) (centerPoint.y - radiusPixels * Math.cos(rad));
             canvas.drawLine(centerPoint.x, centerPoint.y, x2, y2, paintBlue);
         }
 
         for (PointF p : firePoints)
             canvas.drawCircle(p.x, p.y, 5f, paintBlue);
+        if (shellRadiusPixels != 0f) {
+            canvas.drawCircle(x2, y2, shellRadiusPixels, paintBlue);
+        }
     }
 
     @Override

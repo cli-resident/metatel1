@@ -2,11 +2,11 @@
   {
     "name": "ОФС-120",
     "speed": 120,
-    "radius": 0.5
+    "radius": 50
   },
   {
     "name": "БПС-125",
     "speed": 125,
-    "radius": 0.5
+    "radius": 50
   }
 ]
