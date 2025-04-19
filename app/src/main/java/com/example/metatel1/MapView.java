@@ -15,6 +15,8 @@ public class MapView extends View {
     private final List<PointF> scalePoints = new ArrayList<>();
     private final List<PointF[]> calibrationLines = new ArrayList<>();
     private PointF centerPoint = null;
+
+    private PointF aimPoint = null;
     private final List<PointF> firePoints = new ArrayList<>();
     private float radiusPixels = 0f;
     private float shellRadiusPixels = 0f;
@@ -25,7 +27,7 @@ public class MapView extends View {
     float x2;
     float y2;
 
-    private Paint paintRed, paintBlue, paintText;
+    private Paint paintRed, paintBlue, paintGreen;
 
     public interface OnMapTouchListener {
         void onMapTouched(float x, float y);
@@ -49,9 +51,10 @@ public class MapView extends View {
         paintBlue.setStrokeWidth(3f);
         paintBlue.setStyle(Paint.Style.STROKE);
 
-        paintText = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintText.setColor(Color.RED);
-        paintText.setTextSize(24f);
+        paintGreen = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paintGreen.setColor(Color.GREEN);
+        paintGreen.setStrokeWidth(3f);
+        paintGreen.setStyle(Paint.Style.STROKE);
     }
 
     public void setMapBitmap(Bitmap bitmap) {
@@ -62,6 +65,10 @@ public class MapView extends View {
     public void setScalePoints(List<PointF> points) {
         scalePoints.clear();
         scalePoints.addAll(points);
+        invalidate();
+    }
+    public void setAimPoint(PointF aimPoint) {
+        this.aimPoint = aimPoint;
         invalidate();
     }
 
@@ -145,7 +152,18 @@ public class MapView extends View {
         for (PointF p : firePoints)
             canvas.drawCircle(p.x, p.y, 5f, paintBlue);
         if (shellRadiusPixels != 0f) {
-            canvas.drawCircle(x2, y2, shellRadiusPixels, paintBlue);
+            Paint radiusPaint = paintBlue;
+            if (aimPoint != null) {
+                float distance = (float) Math.sqrt(Math.pow(aimPoint.x - x2, 2) + Math.pow(aimPoint.y - y2, 2));
+                if (distance <= shellRadiusPixels) {
+                    radiusPaint = paintGreen;
+                }
+            }
+            canvas.drawCircle(x2, y2, shellRadiusPixels, radiusPaint);
+        }
+
+        if (aimPoint != null) {
+            canvas.drawCircle(aimPoint.x, aimPoint.y, 10f, paintBlue);
         }
     }
 

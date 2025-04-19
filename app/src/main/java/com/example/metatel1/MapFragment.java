@@ -33,6 +33,7 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
     private final List<PointF> scalePoints = new ArrayList<>();
     private final List<PointF> firePoints = new ArrayList<>();
     private PointF centerPoint = null;
+    private PointF aimPoint = null;
 
     private double scale = 0;
     private double angle = 45;
@@ -126,6 +127,10 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
             currentMode = MODE_SET_FIRE;
             modeLabel.setText("Mode: Set Fire Point");
         });
+        root.findViewById(R.id.aimModeBtn).setOnClickListener(v -> {
+            currentMode = MODE_SET_AIM;
+            modeLabel.setText("Mode: Set Aim Point");
+        });
 
         root.findViewById(R.id.shellbutton).setOnClickListener(v -> {
             List<Shell> shells = Shell.loadAll(requireContext());
@@ -192,6 +197,8 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
         mapView.setFirePoints(firePoints);
         mapView.setCenterPoint(null);
         mapView.setScalePoints(scalePoints);
+        mapView.setAimPoint(null);
+        mapView.setShellRadius(0);
         mapView.setRadius(0);
         mapView.clearCalibrationLines();
         mapView.invalidate();
@@ -244,6 +251,10 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
 
             deltaLabel.setText(String.format("delta azimuth: %.2f°, delta speed: %.2f", azimuthFix, speedFix));
             updateRadiusDisplay();
+        }
+        else if (currentMode == MODE_SET_AIM) {
+            aimPoint = point;
+            mapView.setAimPoint(aimPoint);
         }
     }
 

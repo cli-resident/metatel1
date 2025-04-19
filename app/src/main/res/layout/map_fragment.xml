@@ -62,7 +62,6 @@
         android:id="@+id/modeLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
         android:text="Mode: Set Scale"
         app:layout_constraintStart_toEndOf="@+id/scaleLabel"
         app:layout_constraintTop_toBottomOf="@+id/deltaLabel" />
@@ -188,11 +187,19 @@
         android:id="@+id/connectionStatus"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="10dp"
+        android:layout_marginStart="5dp"
         android:text="TextView"
         app:layout_constraintBottom_toTopOf="@+id/mapView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/modeLabel"
         app:layout_constraintTop_toTopOf="@+id/modeLabel" />
+
+    <Button
+        android:id="@+id/aimModeBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Цель"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/resetBtn" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
