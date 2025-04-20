@@ -330,18 +330,10 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
                 String value = input.getText().toString();
                 if (!value.isEmpty()) {
                     double distM = Double.parseDouble(value);
-
-                    // Вычисляем расстояние между двумя точками в пикселях
                     double distPx = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-
-                    // Вычисляем масштаб
                     scale = distM / distPx;
-
-                    // Отображаем
                     scaleLabel.setText(String.format("Scale: %.2f m/px", scale));
                     mapView.addCalibrationLine(p1, p2);
-
-                    // Очищаем точки
                     scalePoints.clear();
                     mapView.setScalePoints(scalePoints);
                 }
