@@ -1,5 +1,6 @@
 package com.example.metatel1;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,12 +10,14 @@ import android.graphics.PointF;
 import android.media.ExifInterface;
 import android.net.Uri;
 import android.os.Bundle;
+import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -93,9 +96,6 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
         scaleLabel = root.findViewById(R.id.scaleLabel);
         modeLabel = root.findViewById(R.id.modeLabel);
         deltaLabel = root.findViewById(R.id.deltaLabel);
-        angleInput = root.findViewById(R.id.angleInput);
-        azimuthInput = root.findViewById(R.id.azimuthInput);
-        distanceInput = root.findViewById(R.id.distanceInput);
         speedSeekBar = root.findViewById(R.id.speedSeekBar);
         speedValue = root.findViewById(R.id.speedValue);
 
@@ -152,20 +152,6 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
             popup.show();
         });
 
-        angleInput.setOnFocusChangeListener((v, f) -> {
-            if (!f) try {
-                angle = Double.parseDouble(angleInput.getText().toString());
-                updateRadiusDisplay();
-            } catch (Exception ignored) {}
-        });
-
-        azimuthInput.setOnFocusChangeListener((v, f) -> {
-            if (!f) try {
-                azimuth = Double.parseDouble(azimuthInput.getText().toString());
-                updateRadiusDisplay();
-            } catch (Exception ignored) {}
-        });
-
         speedSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 speed = progress + speedFix;
@@ -209,18 +195,11 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
     private void handleMapTouch(float x, float y) { // обработка касания и передача/обработка MapView
         PointF point = new PointF(x, y);
 
-        if (currentMode == MODE_SET_SCALE && !(distanceInput.getText().toString().isEmpty())) {
+        if (currentMode == MODE_SET_SCALE) {
             scalePoints.add(point);
             mapView.setScalePoints(scalePoints);
             if (scalePoints.size() == 2) {
-                PointF p1 = scalePoints.get(0), p2 = scalePoints.get(1);
-                double distPx = Math.hypot(p2.x - p1.x, p2.y - p1.y);
-                double distM = Double.parseDouble(distanceInput.getText().toString());
-                scale = distM / distPx;
-                scaleLabel.setText(String.format("Scale: %.2f m/px", scale));
-                mapView.addCalibrationLine(p1, p2);
-                scalePoints.clear();
-                mapView.setScalePoints(scalePoints);
+                showDistanceDialog(scalePoints.get(0), scalePoints.get(1));
             }
         } else if (currentMode == MODE_SET_CENTER) {
             centerPoint = point;
@@ -336,5 +315,43 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
             connectionStatus.setTextColor(getResources().getColor(R.color.red));
         }
     }
+
+    private void showDistanceDialog(PointF p1, PointF p2) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
+        builder.setTitle("Введите расстояние (в метрах)");
+
+        final EditText input = new EditText(requireContext());
+        input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        builder.setView(input);
+
+        builder.setPositiveButton("ОК", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String value = input.getText().toString();
+                if (!value.isEmpty()) {
+                    double distM = Double.parseDouble(value);
+
+                    // Вычисляем расстояние между двумя точками в пикселях
+                    double distPx = Math.hypot(p2.x - p1.x, p2.y - p1.y);
+
+                    // Вычисляем масштаб
+                    scale = distM / distPx;
+
+                    // Отображаем
+                    scaleLabel.setText(String.format("Scale: %.2f m/px", scale));
+                    mapView.addCalibrationLine(p1, p2);
+
+                    // Очищаем точки
+                    scalePoints.clear();
+                    mapView.setScalePoints(scalePoints);
+                }
+            }
+        });
+
+        builder.setNegativeButton("Отмена", (dialog, which) -> dialog.dismiss());
+
+        builder.show();
+    }
+
 }
 
