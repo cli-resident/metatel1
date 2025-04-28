@@ -109,7 +109,6 @@ public class BluetoothManager {
                 try {
                     if ((bytes = inputStream.read(buffer)) > 0) {
                         String data = new String(buffer, 0, bytes);
-                        Log.d(TAG, "Received: " + data);
 
                         BluetoothDataCallback callback = dataCallback;
                         if (callback != null) {

@@ -57,7 +57,6 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
     private BluetoothManager manager;
 
     private final BluetoothManager.BluetoothDataCallback callback = data -> {
-        Log.d("MapFragment", "Получено: " + data);
         processSerial(data);
         updateRadiusDisplay();
     };
@@ -332,6 +331,7 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
                     double distM = Double.parseDouble(value);
                     double distPx = Math.hypot(p2.x - p1.x, p2.y - p1.y);
                     scale = distM / distPx;
+                    mapView.setRealScale((float)scale);
                     scaleLabel.setText(String.format("Scale: %.2f m/px", scale));
                     mapView.addCalibrationLine(p1, p2);
                     scalePoints.clear();

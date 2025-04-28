@@ -1,9 +1,11 @@
 package com.example.metatel1;
 
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.*;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -22,6 +24,8 @@ public class MapView extends View {
     private float shellRadiusPixels = 0f;
     private double azimuth = 0.0;
     private double azimuthFix = 0.0;
+    private float scaleMetersPerPixel = 0f;
+
     double totalAzimuth;
     double rad;
     float x2;
@@ -82,6 +86,11 @@ public class MapView extends View {
         invalidate();
     }
 
+    public void setRealScale(float metersPerPixel) {
+        this.scaleMetersPerPixel = metersPerPixel%0.001f;
+        invalidate();
+    }
+
     public void setCenterPoint(PointF center) {
         this.centerPoint = center;
         invalidate();
@@ -126,7 +135,7 @@ public class MapView extends View {
             float dw = bw * scale;
             float dh = bh * scale;
             float left = (vw - dw) / 2f;
-            float top  = (vh - dh) / 2f;
+            float top = (vh - dh) / 2f;
             RectF dst = new RectF(left, top, left + dw, top + dh);
             canvas.drawBitmap(mapBitmap, null, dst, null);
         }
@@ -165,6 +174,30 @@ public class MapView extends View {
         if (aimPoint != null) {
             canvas.drawCircle(aimPoint.x, aimPoint.y, 10f, paintBlue);
         }
+        if (scaleMetersPerPixel > 0) {
+            Paint scalePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            scalePaint.setColor(Color.WHITE);
+            scalePaint.setStrokeWidth(5f);
+            scalePaint.setTextSize(30f);
+            scalePaint.setStyle(Paint.Style.FILL);
+
+            int segments = 5;
+            float scaleBarLengthPixels = 1000f;
+            float segmentLengthPixels = scaleBarLengthPixels / segments;
+            float segmentLengthMeters = segmentLengthPixels * scaleMetersPerPixel;
+
+            float startX = 20f;
+            float startY = getHeight() - 50f;
+            float currentX = startX;
+
+            for (int i = 0; i <= segments; i++) {
+                float endX = currentX + segmentLengthPixels;
+                canvas.drawLine(currentX, startY, endX, startY, scalePaint);
+                String scaleText = String.format("%.1f м", i * segmentLengthMeters);
+                canvas.drawText(scaleText, currentX, startY - 10f, scalePaint);
+                currentX = endX;
+            }
+        }
     }
 
     @Override
@@ -175,4 +208,5 @@ public class MapView extends View {
         }
         return super.onTouchEvent(event);
     }
+
 }
