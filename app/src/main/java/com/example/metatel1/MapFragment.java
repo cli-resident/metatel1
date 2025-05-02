@@ -99,7 +99,7 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
         speedValue = root.findViewById(R.id.speedValue);
 
         connectionStatus = root.findViewById(R.id.connectionStatus);
-        connectionStatus.setText("Connected");
+        connectionStatus.setText("Подключено");
         connectionStatus.setTextColor(getResources().getColor(R.color.green));
 
 
@@ -112,23 +112,23 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
 
         root.findViewById(R.id.scaleModeBtn).setOnClickListener(v -> {
             currentMode = MODE_SET_SCALE;
-            modeLabel.setText("Mode: Set Scale");
+            modeLabel.setText("Режим: Выбор масштаба");
             scalePoints.clear();
             mapView.setScalePoints(scalePoints);
         });
 
         root.findViewById(R.id.centerModeBtn).setOnClickListener(v -> {
             currentMode = MODE_SET_CENTER;
-            modeLabel.setText("Mode: Set Center");
+            modeLabel.setText("Режим: Выбор точки стрельбы");
         });
 
         root.findViewById(R.id.fireModeBtn).setOnClickListener(v -> {
             currentMode = MODE_SET_FIRE;
-            modeLabel.setText("Mode: Set Fire Point");
+            modeLabel.setText("Режим: Выбор точки прилета");
         });
         root.findViewById(R.id.aimModeBtn).setOnClickListener(v -> {
             currentMode = MODE_SET_AIM;
-            modeLabel.setText("Mode: Set Aim Point");
+            modeLabel.setText("Режим: Выбор цели");
         });
 
         root.findViewById(R.id.shellbutton).setOnClickListener(v -> {
@@ -154,7 +154,7 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
         speedSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 speed = progress + speedFix;
-                speedValue.setText("Speed: " + speed);
+                speedValue.setText("Скорость,м/с:" + speed);
                 updateRadiusDisplay();
             }
             public void onStartTrackingTouch(SeekBar seekBar) {}

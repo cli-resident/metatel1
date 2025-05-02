@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/map_root"
@@ -11,8 +10,11 @@
 
     <Button
         android:id="@+id/resetBtn"
+        style="@style/Widget.MaterialComponents.Button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="2dp"
         android:text="Сброс"
         app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,36 +22,36 @@
 
     <Button
         android:id="@+id/fireModeBtn"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="4dp"
         android:text="Куда попали"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintStart_toEndOf="@+id/scaleModeBtn"
-        app:layout_constraintTop_toBottomOf="@+id/speedValue" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
     <Button
         android:id="@+id/scaleModeBtn"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginTop="10dp"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:layout_marginBottom="4dp"
         android:text="Масштаб"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/fireModeBtn"
-        app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintStart_toEndOf="@+id/centerModeBtn"
-        app:layout_constraintTop_toBottomOf="@+id/speedSeekBar" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/centerModeBtn" />
 
     <Button
         android:id="@+id/centerModeBtn"
-        style="@style/Widget.Material3.Button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        style="@style/Widget.MaterialComponents.Button"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:layout_marginStart="2dp"
+        android:layout_marginBottom="4dp"
         android:text="Место стрельбы"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/scaleModeBtn"
-        app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
@@ -79,16 +81,12 @@
 
     <SeekBar
         android:id="@+id/speedSeekBar"
-        android:layout_width="0dp"
+        android:layout_width="200dp"
         android:layout_height="20dp"
-        android:layout_marginBottom="10dp"
-        android:max="200"
-        android:progress="10"
+        android:max="300"
+        android:progress="1"
         app:layout_constraintBottom_toTopOf="@+id/centerModeBtn"
-        app:layout_constraintEnd_toStartOf="@+id/speedValue"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mapView" />
+        app:layout_constraintStart_toStartOf="parent" />
 
     <com.example.metatel1.MapView
         android:id="@+id/mapView"
@@ -101,30 +99,30 @@
 
     <TextView
         android:id="@+id/speedValue"
-        android:layout_width="80dp"
+        android:layout_width="wrap_content"
         android:layout_height="20dp"
-        android:layout_marginBottom="10dp"
         android:text="Speed: 10"
-        app:layout_constraintBottom_toTopOf="@+id/fireModeBtn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/speedSeekBar"
-        app:layout_constraintTop_toBottomOf="@+id/mapView" />
+        app:layout_constraintBottom_toTopOf="@+id/centerModeBtn"
+        app:layout_constraintStart_toEndOf="@+id/speedSeekBar" />
 
     <ImageView
         android:id="@+id/cursor"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        app:srcCompat="@drawable/cursor"
+        app:srcCompat="@drawable/cursor1"
         tools:layout_editor_absoluteX="168dp"
         tools:layout_editor_absoluteY="402dp" />
 
     <Button
         android:id="@+id/shellbutton"
+        style="@style/Widget.MaterialComponents.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="4dp"
         android:text="Снаряд"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/connectionStatus" />
+        app:layout_constraintTop_toTopOf="@+id/mapView" />
 
     <TextView
         android:id="@+id/connectionStatus"
@@ -139,10 +137,13 @@
 
     <Button
         android:id="@+id/aimModeBtn"
+        style="@style/Widget.MaterialComponents.Button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="2dp"
         android:text="Цель"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/resetBtn" />
+        app:layout_constraintTop_toTopOf="@+id/mapView" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

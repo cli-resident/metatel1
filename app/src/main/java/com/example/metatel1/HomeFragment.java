@@ -24,7 +24,7 @@ public class HomeFragment extends Fragment implements BluetoothManager.Connectio
             Manifest.permission.BLUETOOTH_SCAN
     };
     boolean connected = false;
-    TextView connectionStatus;
+    TextView connection;
 
     @Nullable
     @Override
@@ -32,7 +32,7 @@ public class HomeFragment extends Fragment implements BluetoothManager.Connectio
         View root = inflater.inflate(R.layout.home_fragment, container, false);
         Button BTButton = root.findViewById(R.id.BTButton);
         Button EnterButton = root.findViewById(R.id.EnterButton);
-        connectionStatus = root.findViewById(R.id.connection);
+        connection = root.findViewById(R.id.connection);
         BluetoothManager manager = BluetoothManager.getInstance(getContext());
         manager.setConnectionStateListener(this);
         BTButton.setOnClickListener(v -> {
@@ -54,7 +54,7 @@ public class HomeFragment extends Fragment implements BluetoothManager.Connectio
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_homeFragment_to_mapFragment);}
             else{
-                connectionStatus.setText("Подключитесь перед использованием!");
+                connection.setText("Подключитесь перед использованием!");
             }
         });
         Button menuButton = root.findViewById(R.id.menu_button);
@@ -78,6 +78,14 @@ public class HomeFragment extends Fragment implements BluetoothManager.Connectio
     @Override
     public void onConnectionStateChanged(boolean isConnected) {
         connected = isConnected;
-        connectionStatus.setText(isConnected ? "Connected" : "Disconnected");
+        connection.setText(isConnected ? "Подключено" : "Не подключено");
+        if(connected){
+            connection.setText("Подключено");
+            connection.setTextColor(getResources().getColor(R.color.green));
+
+        }else {
+            connection.setText("Не подключено");
+            connection.setTextColor(getResources().getColor(R.color.red));
+        }
     }
 }
