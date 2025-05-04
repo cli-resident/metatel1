@@ -49,7 +49,7 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
 
     private MapView mapView;
     private EditText angleInput, azimuthInput, distanceInput;
-    private TextView scaleLabel, modeLabel, deltaLabel,speedValue,connectionStatus;
+    private TextView scaleLabel, modeLabel, deltaLabel, speedValue, connectionStatus, deltaLabelspeed;
     private SeekBar speedSeekBar;
     private ImageView cursor;
 
@@ -97,6 +97,7 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
         deltaLabel = root.findViewById(R.id.deltaLabel);
         speedSeekBar = root.findViewById(R.id.speedSeekBar);
         speedValue = root.findViewById(R.id.speedValue);
+        deltaLabelspeed = root.findViewById(R.id.deltaLabelspeed);
 
         connectionStatus = root.findViewById(R.id.connectionStatus);
         connectionStatus.setText("Подключено");
@@ -145,6 +146,8 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
             popup.setOnMenuItemClickListener(item -> {
                 selectedShell = shells.get(item.getItemId());
                 mapView.setShellRadius((float) (selectedShell.getRadius()/scale));
+                speed = selectedShell.getSpeed();
+                speedSeekBar.setProgress((int)speed);
                 Toast.makeText(requireContext(), selectedShell.getName()+selectedShell.getRadius(), Toast.LENGTH_SHORT).show();
                 return true;
             });
@@ -187,8 +190,9 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
         mapView.setRadius(0);
         mapView.clearCalibrationLines();
         mapView.invalidate();
-        scaleLabel.setText("Scale: Not set");
-        deltaLabel.setText("delta azimuth: 0.00°, delta speed: 0.00");
+        scaleLabel.setText("Масштаб: Не задан");
+        deltaLabel.setText("Поправка адимута: 0.00°");
+        deltaLabelspeed.setText("Поправка скорости: 0.00");
     }
 
     private void handleMapTouch(float x, float y) { // обработка касания и передача/обработка MapView
@@ -227,7 +231,8 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
             double cross = vx * dirY - vy * dirX;
             azimuthFix = Math.toDegrees(cross < 0 ? angleBetween : -angleBetween);
 
-            deltaLabel.setText(String.format("delta azimuth: %.2f°, delta speed: %.2f", azimuthFix, speedFix));
+            deltaLabel.setText(String.format("Поправка азимута: %.2f°", azimuthFix));
+            deltaLabelspeed.setText(String.format("Поправка скорости: %.2f", speedFix));
             updateRadiusDisplay();
         }
         else if (currentMode == MODE_SET_AIM) {
@@ -307,10 +312,10 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
     public void onConnectionStateChanged(boolean isConnected) {
         connectionStatus = requireView().findViewById(R.id.connectionStatus);
         if (isConnected) {
-            connectionStatus.setText("Connected");
+            connectionStatus.setText("Подключено");
             connectionStatus.setTextColor(getResources().getColor(R.color.green));
         } else {
-            connectionStatus.setText("Disconnected");
+            connectionStatus.setText("Не подключено");
             connectionStatus.setTextColor(getResources().getColor(R.color.red));
         }
     }
@@ -332,7 +337,7 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
                     double distPx = Math.hypot(p2.x - p1.x, p2.y - p1.y);
                     scale = distM / distPx;
                     mapView.setRealScale((float)scale);
-                    scaleLabel.setText(String.format("Scale: %.2f m/px", scale));
+                    scaleLabel.setText(String.format("Масштаб: %.2f m/px", scale));
                     mapView.addCalibrationLine(p1, p2);
                     scalePoints.clear();
                     mapView.setScalePoints(scalePoints);

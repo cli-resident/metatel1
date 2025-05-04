@@ -31,7 +31,7 @@ public class MapView extends View {
     float x2;
     float y2;
 
-    private Paint paintRed, paintBlue, paintGreen;
+    private Paint paintRed, paintBlue, paintGreen, paintYellow;
 
     public interface OnMapTouchListener {
         void onMapTouched(float x, float y);
@@ -59,6 +59,11 @@ public class MapView extends View {
         paintGreen.setColor(Color.GREEN);
         paintGreen.setStrokeWidth(3f);
         paintGreen.setStyle(Paint.Style.STROKE);
+
+        paintYellow = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paintYellow.setColor(Color.YELLOW);
+        paintYellow.setStrokeWidth(3f);
+        paintYellow.setStyle(Paint.Style.STROKE);
     }
 
     public void setMapBitmap(Bitmap bitmap) {
@@ -145,7 +150,7 @@ public class MapView extends View {
             PointF p1 = line[0], p2 = line[1];
             canvas.drawCircle(p1.x, p1.y, 5f, paintRed);
             canvas.drawCircle(p2.x, p2.y, 5f, paintRed);
-            canvas.drawLine(p1.x, p1.y, p2.x, p2.y, paintRed);
+            canvas.drawLine(p1.x, p1.y, p2.x, p2.y, paintYellow);
         }
 
         for (PointF p : scalePoints) canvas.drawCircle(p.x, p.y, 5f, paintRed);
@@ -160,6 +165,7 @@ public class MapView extends View {
 
         for (PointF p : firePoints)
             canvas.drawCircle(p.x, p.y, 5f, paintBlue);
+
         if (shellRadiusPixels != 0f) {
             Paint radiusPaint = paintBlue;
             if (aimPoint != null) {
