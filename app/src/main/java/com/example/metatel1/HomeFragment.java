@@ -50,7 +50,7 @@ public class HomeFragment extends Fragment implements BluetoothManager.Connectio
 
 
         EnterButton.setOnClickListener(v -> {
-            if(!connected){
+            if(connected){
             NavController navController = Navigation.findNavController(requireView());
             navController.navigate(R.id.action_homeFragment_to_mapFragment);}
             else{

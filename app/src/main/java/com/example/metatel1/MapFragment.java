@@ -191,7 +191,7 @@ public class MapFragment extends Fragment implements BluetoothManager.Connection
         mapView.clearCalibrationLines();
         mapView.invalidate();
         scaleLabel.setText("Масштаб: Не задан");
-        deltaLabel.setText("Поправка адимута: 0.00°");
+        deltaLabel.setText("Поправка азимута: 0.00°");
         deltaLabelspeed.setText("Поправка скорости: 0.00");
     }
 
