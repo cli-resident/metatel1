@@ -34,6 +34,7 @@ public class MapView extends View {
     float center_y;
     float scale;
 
+    // Отрисовка маркеров с уменьшением их размера
     private Paint paintRed, paintBlue, paintGreen, paintYellow, paintCyan;
     Bitmap mark2Bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.mark2);
     Bitmap mark1Bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.mark1);
@@ -57,7 +58,7 @@ public class MapView extends View {
         super(context, attrs);
         init();
     }
-
+    // Назначение цветовых атрибутов линиям
     private void init() {
         paintRed = new Paint(Paint.ANTI_ALIAS_FLAG);
         paintRed.setColor(Color.RED);
@@ -111,7 +112,7 @@ public class MapView extends View {
     }
 
     public void setRealScale(float metersPerPixel) {
-        this.scaleMetersPerPixel = metersPerPixel % 0.001f;
+        this.scaleMetersPerPixel = metersPerPixel;
         invalidate();
     }
 
@@ -164,14 +165,14 @@ public class MapView extends View {
             canvas.drawBitmap(mapBitmap, null, dst, null);
         }
 
-
+        // установка отрезка для вычисления масштаба
         for (PointF[] line : calibrationLines) {
             PointF p1 = line[0], p2 = line[1];
             canvas.drawCircle(p1.x, p1.y, 5f, paintRed);
             canvas.drawCircle(p2.x, p2.y, 5f, paintRed);
             canvas.drawLine(p1.x, p1.y, p2.x, p2.y, paintYellow);
         }
-
+        // отрисовка окружности с центром в точке стрельбы и радиусом, соответствующим скорости выстрела и углу наклона
         for (PointF p : scalePoints) canvas.drawCircle(p.x, p.y, 5f, paintRed);
         if (centerPoint != null) {
             totalAzimuth = azimuth + azimuthFix;
@@ -187,7 +188,7 @@ public class MapView extends View {
 
         for (PointF p : firePoints) //указываем место, куда попали
             canvas.drawCircle(p.x, p.y, 5f, paintCyan);
-
+        // проверка попадания в окружность, соответствующую радиусу разлета, установленному в характеристиках снаряда
         if (shellRadiusPixels != 0f) {
             Paint radiusPaint = paintBlue;
             if (aimPoint != null) {
@@ -203,52 +204,73 @@ public class MapView extends View {
             canvas.drawCircle(aimPoint.x, aimPoint.y, 10f, paintBlue);
             canvas.drawBitmap(scaledMark2Bitmap, aimPoint.x - mark2X, aimPoint.y, null);
         }
+// отрисовка горизонтальной линейки масштаба
         if (scaleMetersPerPixel > 0) {
             Paint scalePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
             scalePaint.setColor(Color.MAGENTA);
-            scalePaint.setStrokeWidth(1f);
-            scalePaint.setTextSize(20f);
+            scalePaint.setStrokeWidth(2f);
+            scalePaint.setTextSize(30f);
             scalePaint.setStyle(Paint.Style.FILL);
 
-            int segments = 5;
+            int segmentsX = 5;
+            int segmentsY = 7;
             float scaleBarLengthPixels = 1000f;
-            float segmentLengthPixels = scaleBarLengthPixels / segments;
-            float segmentLengthMeters = segmentLengthPixels * scaleMetersPerPixel;
-
+            float segmentLengthPixelsX = scaleBarLengthPixels / segmentsX;
+            float segmentLengthPixelsY = scaleBarLengthPixels / segmentsY;
+            float segmentLengthMetersX = segmentLengthPixelsX * scaleMetersPerPixel;
+            float segmentLengthMetersY = segmentLengthPixelsY * scaleMetersPerPixel;
             float startX = 20f;
-            float startY = getHeight() - 50f;
+            float startY = 10f;
+            float startY_line = getHeight() - 70f;
+            float startX_line = 20f;
 
             float centerX = center_x; // Используем center_x для центральной точки
+            float centerY = center_y; // Используем center_y для центральной точки
 
-            // Рисуем центральную отметку
-            canvas.drawLine(centerX, startY - 10f, centerX, startY + 10f, scalePaint);
-            canvas.drawText("0 м", centerX, startY - 20f, scalePaint);
+            // Рисуем центральную отметку X
+            canvas.drawLine(centerX, startY_line - 10f, centerX, startY_line + 10f, scalePaint);
+            canvas.drawText("0 м", centerX, startY_line - 20f, scalePaint);
+
+            // Рисуем центральную отметку Y
+            canvas.drawLine(startX_line - 10f, centerY,startX_line + 10f, centerY, scalePaint);
+            canvas.drawText("0 м", startX_line + 5f, centerY - 15f, scalePaint);
 
             // Рисуем сегменты слева от центра
-            float currentX = centerX - segmentLengthPixels;
-            int segmentCount = 1;
+            float currentX = centerX - segmentLengthPixelsX;
+            int segmentCountX = 1;
             while (currentX > 0) {
-                canvas.drawLine(currentX, startY - 10f, currentX, startY + 10f, scalePaint);
-                String scaleText = String.format("%.1f м", -segmentCount * segmentLengthMeters);
-                canvas.drawText(scaleText, currentX, startY - 20f, scalePaint);
-                currentX -= segmentLengthPixels;
-                segmentCount++;
+                canvas.drawLine(currentX, startY_line - 10f, currentX, startY_line + 10f, scalePaint);
+                String scaleText = String.format("%.0f м", -segmentCountX * segmentLengthMetersX);
+                canvas.drawText(scaleText, currentX, startY_line - 20f, scalePaint);
+                currentX -= segmentLengthPixelsX;
+                segmentCountX++;
+            }
+            // Рисуем сегменты сверху от центра
+            float currentY = centerY - segmentLengthPixelsY;
+            int segmentCountY = 1;
+            while (currentY > 0) {
+                canvas.drawLine(startX_line - 5f, currentY, startX_line + 5f, currentY, scalePaint);
+                String scaleText = String.format("%.0f м", segmentCountY * segmentLengthMetersY);
+                canvas.drawText(scaleText, startX_line + 10f, currentY, scalePaint);
+                currentY -= segmentLengthPixelsY;
+                segmentCountY++;
             }
 
             // Рисуем сегменты справа от центра
-            currentX = centerX + segmentLengthPixels;
-            segmentCount = 1;
+            currentX = centerX + segmentLengthPixelsX;
+            segmentCountX = 1;
             while (currentX < getWidth()) {
-                canvas.drawLine(currentX, startY - 10f, currentX, startY + 10f, scalePaint);
-                String scaleText = String.format("%.1f м", segmentCount * segmentLengthMeters);
-                canvas.drawText(scaleText, currentX, startY - 20f, scalePaint);
-                currentX += segmentLengthPixels;
-                segmentCount++;
+                canvas.drawLine(currentX, startY_line - 10f, currentX, startY_line + 10f, scalePaint);
+                String scaleText = String.format("%.0f м", segmentCountX * segmentLengthMetersX);
+                canvas.drawText(scaleText, currentX, startY_line - 20f, scalePaint);
+                currentX += segmentLengthPixelsX;
+                segmentCountX++;
             }
 
             // Рисуем горизонтальную линию
-            canvas.drawLine(0, startY, getWidth(), startY, scalePaint);
-            
+            canvas.drawLine(0, startY_line, getWidth(), startY_line, scalePaint);
+            // Рисуем вертикальную линию
+            canvas.drawLine(startX_line, 0, startX_line, getHeight(), scalePaint);
         }
     }
 
