@@ -117,7 +117,10 @@ public class BluetoothManager {
                     }
                 } catch (IOException e) {
                     Log.e(TAG, "Error in reading thread", e);
-                    notifyConnectionStateChanged(false);
+                    isReading = false;
+
+                    // перекинул в основной поток, больше не крашит
+                    new Handler(Looper.getMainLooper()).post(() -> notifyConnectionStateChanged(false));
                     break;
                 }
             }
@@ -157,6 +160,10 @@ public class BluetoothManager {
         if (connectionStateListener != null) {
             connectionStateListener.onConnectionStateChanged(isConnected);
         }
+    }
+
+    public boolean isConnected() {
+        return bluetoothSocket != null && bluetoothSocket.isConnected();
     }
 
     public interface BluetoothDataCallback {

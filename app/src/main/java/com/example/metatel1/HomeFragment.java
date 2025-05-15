@@ -24,6 +24,7 @@ public class HomeFragment extends Fragment implements BluetoothManager.Connectio
             Manifest.permission.BLUETOOTH_SCAN
     };
     boolean connected = false;
+    private boolean connectionAttempted = false;
     TextView connection;
 
     @Nullable
@@ -36,6 +37,7 @@ public class HomeFragment extends Fragment implements BluetoothManager.Connectio
         BluetoothManager manager = BluetoothManager.getInstance(getContext());
         manager.setConnectionStateListener(this);
         BTButton.setOnClickListener(v -> {
+            connectionAttempted = true;
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED ||
                         ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
@@ -63,7 +65,8 @@ public class HomeFragment extends Fragment implements BluetoothManager.Connectio
             popup.getMenuInflater().inflate(R.menu.main_menu, popup.getMenu());
             popup.setOnMenuItemClickListener(item -> {
                 if (item.getItemId() == R.id.action_settings) {
-                    // тут настройки открыть надо
+                    NavController navController = Navigation.findNavController(requireView());
+                    navController.navigate(R.id.action_homeFragment_to_settingsFragment);
                     return true;
                 }
                 return false;
@@ -86,6 +89,21 @@ public class HomeFragment extends Fragment implements BluetoothManager.Connectio
         }else {
             connection.setText("Не подключено");
             connection.setTextColor(getResources().getColor(R.color.red));
+        }
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (connectionAttempted) {
+            BluetoothManager manager = BluetoothManager.getInstance(getContext());
+            connected = manager.isConnected();
+            if (connected) {
+                connection.setText("Подключено");
+                connection.setTextColor(getResources().getColor(R.color.green));
+            } else {
+                connection.setText("Не подключено");
+                connection.setTextColor(getResources().getColor(R.color.red));
+            }
         }
     }
 }

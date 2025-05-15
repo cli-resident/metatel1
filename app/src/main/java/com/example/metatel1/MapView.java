@@ -219,8 +219,6 @@ public class MapView extends View {
             float segmentLengthPixelsY = scaleBarLengthPixels / segmentsY;
             float segmentLengthMetersX = segmentLengthPixelsX * scaleMetersPerPixel;
             float segmentLengthMetersY = segmentLengthPixelsY * scaleMetersPerPixel;
-            float startX = 20f;
-            float startY = 10f;
             float startY_line = getHeight() - 70f;
             float startX_line = 20f;
 
@@ -267,9 +265,7 @@ public class MapView extends View {
                 segmentCountX++;
             }
 
-            // Рисуем горизонтальную линию
             canvas.drawLine(0, startY_line, getWidth(), startY_line, scalePaint);
-            // Рисуем вертикальную линию
             canvas.drawLine(startX_line, 0, startX_line, getHeight(), scalePaint);
         }
     }
